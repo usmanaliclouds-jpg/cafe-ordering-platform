@@ -1,0 +1,8 @@
+**/node_modules/
+**/dist/
+**/.env
+backend/db/cafe.sqlite
+backend/db/cafe.sqlite-journal
+backend/db/cafe.sqlite-wal
+backend/db/cafe.sqlite-shm
+.DS_Store
