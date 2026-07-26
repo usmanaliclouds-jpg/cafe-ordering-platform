@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 
 const STATUS_OPTIONS = ["placed", "preparing", "out_for_delivery", "completed", "cancelled"];
 const STATUS_LABEL = {
@@ -13,6 +14,7 @@ const STATUS_LABEL = {
 
 export default function AdminOrders() {
   const { token } = useAuth();
+  const { showToast } = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,6 +31,7 @@ export default function AdminOrders() {
     try {
       await api.updateOrderStatus(orderId, status, token);
       setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
+      showToast(`Order #${orderId} marked ${STATUS_LABEL[status]}`, "success");
     } catch (err) {
       setError(err.message);
     }

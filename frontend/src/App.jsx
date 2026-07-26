@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
+import BackToTop from "./components/BackToTop.jsx";
 import { RequireAuth, RequireAdmin } from "./components/ProtectedRoute.jsx";
 
 import Menu from "./pages/Menu.jsx";
@@ -45,6 +46,7 @@ export default function App() {
           }
         />
       </Routes>
+      <BackToTop />
       <footer>Ember &amp; Oak — Cafe Ordering Platform · Built as a portfolio project</footer>
     </>
   );

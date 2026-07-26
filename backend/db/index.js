@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
   price REAL NOT NULL,
   category TEXT NOT NULL DEFAULT 'Mains',
   image_url TEXT DEFAULT '',
+  badge TEXT DEFAULT '',
   is_available INTEGER NOT NULL DEFAULT 1,
   created_at TEXT DEFAULT (datetime('now'))
 );
@@ -53,6 +54,12 @@ CREATE TABLE IF NOT EXISTS order_items (
 );
 `);
 
+// ---- Lightweight migration for databases created before `badge` existed ----
+const menuColumns = db.prepare("PRAGMA table_info(menu_items)").all().map((c) => c.name);
+if (!menuColumns.includes("badge")) {
+  db.exec("ALTER TABLE menu_items ADD COLUMN badge TEXT DEFAULT ''");
+}
+
 // ---- Seed default admin + sample menu on first run --------------------
 function seedIfEmpty() {
   const userCount = db.prepare("SELECT COUNT(*) AS c FROM users").get().c;
@@ -69,17 +76,17 @@ function seedIfEmpty() {
   const menuCount = db.prepare("SELECT COUNT(*) AS c FROM menu_items").get().c;
   if (menuCount === 0) {
     const insert = db.prepare(
-      "INSERT INTO menu_items (name, description, price, category, image_url) VALUES (?, ?, ?, ?, ?)"
+      "INSERT INTO menu_items (name, description, price, category, image_url, badge) VALUES (?, ?, ?, ?, ?, ?)"
     );
     const items = [
-      ["Espresso", "Double shot, rich and bold.", 3.5, "Coffee", ""],
-      ["Cappuccino", "Espresso with steamed milk and foam.", 4.5, "Coffee", ""],
-      ["Iced Latte", "Chilled espresso over milk and ice.", 5.0, "Coffee", ""],
-      ["Margherita Pizza", "Tomato, mozzarella, and fresh basil.", 9.5, "Mains", ""],
-      ["Grilled Chicken Sandwich", "Grilled chicken, lettuce, tomato, aioli.", 8.0, "Mains", ""],
-      ["Caesar Salad", "Romaine, parmesan, croutons, Caesar dressing.", 7.5, "Salads", ""],
-      ["Chocolate Brownie", "Warm fudge brownie with a scoop of vanilla.", 5.5, "Desserts", ""],
-      ["Cheesecake Slice", "Classic New York style cheesecake.", 6.0, "Desserts", ""],
+      ["Espresso", "Double shot, rich and bold.", 3.5, "Coffee", "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=600&q=80", ""],
+      ["Cappuccino", "Espresso with steamed milk and foam.", 4.5, "Coffee", "https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&q=80", "Popular"],
+      ["Iced Latte", "Chilled espresso over milk and ice.", 5.0, "Coffee", "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80", "New"],
+      ["Margherita Pizza", "Tomato, mozzarella, and fresh basil.", 9.5, "Mains", "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=600&q=80", "Best Seller"],
+      ["Grilled Chicken Sandwich", "Grilled chicken, lettuce, tomato, aioli.", 8.0, "Mains", "https://images.unsplash.com/photo-1567234669003-dce7a7a88821?w=600&q=80", ""],
+      ["Caesar Salad", "Romaine, parmesan, croutons, Caesar dressing.", 7.5, "Salads", "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=600&q=80", ""],
+      ["Chocolate Brownie", "Warm fudge brownie with a scoop of vanilla.", 5.5, "Desserts", "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&q=80", "Popular"],
+      ["Cheesecake Slice", "Classic New York style cheesecake.", 6.0, "Desserts", "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=600&q=80", ""],
     ];
     const insertMany = db.transaction((rows) => {
       for (const row of rows) insert.run(...row);

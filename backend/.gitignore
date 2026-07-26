@@ -4,3 +4,5 @@ db/cafe.sqlite
 db/cafe.sqlite-journal
 db/cafe.sqlite-wal
 db/cafe.sqlite-shm
+uploads/*
+!uploads/.gitkeep

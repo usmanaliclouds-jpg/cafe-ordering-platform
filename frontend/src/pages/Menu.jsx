@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { api } from "../api.js";
 import { useCart } from "../context/CartContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
+import ProductImage from "../components/ProductImage.jsx";
+import MenuCardSkeleton from "../components/MenuCardSkeleton.jsx";
 
 export default function Menu() {
   const [items, setItems] = useState([]);
@@ -8,7 +11,7 @@ export default function Menu() {
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const { addItem } = useCart();
-  const [justAdded, setJustAdded] = useState(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     api
@@ -26,8 +29,7 @@ export default function Menu() {
 
   function handleAdd(item) {
     addItem(item);
-    setJustAdded(item.id);
-    setTimeout(() => setJustAdded(null), 900);
+    showToast(`Added ${item.name} to cart`, "success");
   }
 
   return (
@@ -44,10 +46,11 @@ export default function Menu() {
       </section>
 
       <div className="container">
-        {loading && <p>Loading menu…</p>}
         {error && <div className="error-banner">{error}</div>}
 
-        {!loading && !error && (
+        {loading ? (
+          <MenuCardSkeleton />
+        ) : (
           <>
             <div className="category-tabs">
               {categories.map((c) => (
@@ -65,22 +68,33 @@ export default function Menu() {
               <div className="empty-state">Nothing here yet — check back soon.</div>
             ) : (
               <div className="menu-grid">
-                {visible.map((item) => (
-                  <div className="menu-card" key={item.id}>
-                    <div className="menu-card-media">{item.name.charAt(0)}</div>
+                {visible.map((item, i) => (
+                  <div
+                    className="menu-card reveal-up"
+                    key={item.id}
+                    style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}
+                  >
+                    <div className="menu-card-media-wrap">
+                      <ProductImage src={item.image_url} alt={item.name} initial={item.name.charAt(0)} />
+                      {item.badge && (
+                        <span className={`product-badge badge-${item.badge.replace(/\s+/g, "-").toLowerCase()}`}>
+                          {item.badge}
+                        </span>
+                      )}
+                      {!item.is_available && <span className="soldout-overlay">Sold out</span>}
+                    </div>
                     <div className="menu-card-body">
                       <div className="menu-card-top">
                         <h3>{item.name}</h3>
                         <span className="menu-card-price">${item.price.toFixed(2)}</span>
                       </div>
-                      {!item.is_available && <span className="unavailable-tag">Sold out</span>}
                       <p className="menu-card-desc">{item.description}</p>
                       <button
-                        className="btn btn-primary btn-block"
+                        className="btn btn-primary btn-block btn-shine"
                         disabled={!item.is_available}
                         onClick={() => handleAdd(item)}
                       >
-                        {justAdded === item.id ? "Added ✓" : "Add to cart"}
+                        {item.is_available ? "Add to cart" : "Sold out"}
                       </button>
                     </div>
                   </div>

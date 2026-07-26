@@ -3,10 +3,12 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 
 export default function Checkout() {
   const { user, token } = useAuth();
   const { items, total, clearCart } = useCart();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const [customerName, setCustomerName] = useState(user?.name || "");
@@ -34,6 +36,7 @@ export default function Checkout() {
         token
       );
       clearCart();
+      showToast("Order placed successfully!", "success");
       navigate(`/orders?placed=${order.id}`);
     } catch (err) {
       setError(err.message);

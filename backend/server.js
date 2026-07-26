@@ -9,6 +9,7 @@ require("./db"); // initializes + seeds the SQLite database on startup
 const authRoutes = require("./routes/auth");
 const menuRoutes = require("./routes/menu");
 const orderRoutes = require("./routes/orders");
+const uploadRoutes = require("./routes/upload");
 
 const app = express();
 
@@ -16,11 +17,15 @@ app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
 app.use(express.json());
 app.use(morgan("dev"));
 
+// Serve uploaded product images
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // Fallback 404 for unknown API routes
 app.use("/api", (req, res) => res.status(404).json({ error: "Not found" }));

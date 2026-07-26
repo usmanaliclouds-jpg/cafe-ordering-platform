@@ -1,10 +1,11 @@
 # Ember & Oak — Cafe / Restaurant Online Ordering Platform
 
 A complete full-stack ordering application:
-- **Customer side:** browse the menu, add items to a cart, check out, and track order status live (Placed → Preparing → Out for delivery → Completed).
-- **Admin side:** log in as an admin to manage menu items (add/edit/delete/mark sold out) and view & update every incoming order.
+- **Customer side:** browse the menu with real product photos, add items to a cart, check out, and track order status live (Placed → Preparing → Out for delivery → Completed).
+- **Admin side:** log in as an admin to manage menu items — including drag-and-drop image uploads, badges (New/Popular/Best Seller/Limited), and stock status — and view & update every incoming order.
 - **Auth:** JWT-based accounts for both customers and admins (same `users` table, different `role`).
 - **Database:** SQLite (file-based — zero setup, zero cost, no external database needed).
+- **Polish:** toast notifications, skeleton loading states, hover/scale animations, image zoom on hover, and a glass-effect sticky nav.
 
 Stack: **React + Vite** (frontend) and **Node.js + Express + SQLite** (backend). Both are 100% free and open-source — nothing here requires a paid plan, API key, or credit card.
 
