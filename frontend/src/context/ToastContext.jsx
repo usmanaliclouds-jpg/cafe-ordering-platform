@@ -1,8 +1,15 @@
 import React, { createContext, useCallback, useContext, useState } from "react";
+import { CheckCircle2, Info, XCircle } from "lucide-react";
 
 const ToastContext = createContext(null);
 
 let idCounter = 0;
+
+const ICONS = {
+  success: CheckCircle2,
+  info: Info,
+  error: XCircle,
+};
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
@@ -19,11 +26,15 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={{ showToast }}>
       {children}
       <div className="toast-stack">
-        {toasts.map((t) => (
-          <div key={t.id} className={`toast toast-${t.type}`}>
-            {t.message}
-          </div>
-        ))}
+        {toasts.map((t) => {
+          const Icon = ICONS[t.type] || Info;
+          return (
+            <div key={t.id} className={`toast toast-${t.type}`}>
+              <Icon />
+              {t.message}
+            </div>
+          );
+        })}
       </div>
     </ToastContext.Provider>
   );

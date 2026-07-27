@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Package } from "lucide-react";
 import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -40,7 +41,11 @@ export default function OrderTracking() {
       {error && <div className="error-banner">{error}</div>}
 
       {!loading && orders.length === 0 && (
-        <div className="empty-state">You haven't placed any orders yet.</div>
+        <div className="empty-state">
+          <Package />
+          <h3>No orders yet</h3>
+          <p>You haven't placed any orders yet.</p>
+        </div>
       )}
 
       {orders.map((order) => {

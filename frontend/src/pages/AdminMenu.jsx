@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Search, Plus, Pencil, Trash2, UtensilsCrossed } from "lucide-react";
 import { api, resolveImageUrl } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useToast } from "../context/ToastContext.jsx";
 import ImageUploadField from "../components/ImageUploadField.jsx";
+import ActionMenu from "../components/ActionMenu.jsx";
 
 const emptyForm = { name: "", description: "", price: "", category: "Mains", image_url: "", badge: "", is_available: true };
 const BADGE_OPTIONS = ["", "New", "Popular", "Best Seller", "Limited"];
@@ -13,6 +15,7 @@ export default function AdminMenu() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
@@ -24,6 +27,12 @@ export default function AdminMenu() {
   }
 
   useEffect(load, []);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter((i) => i.name.toLowerCase().includes(q) || i.category.toLowerCase().includes(q));
+  }, [items, search]);
 
   function openCreate() {
     setEditingId(null);
@@ -82,12 +91,27 @@ export default function AdminMenu() {
     <div>
       <div className="toolbar">
         <h2 style={{ margin: 0 }}>Menu items</h2>
-        <button className="btn btn-gold btn-shine" onClick={openCreate}>+ Add menu item</button>
+        <div className="toolbar-filters">
+          <div className="search-input">
+            <Search />
+            <input placeholder="Search menu…" value={search} onChange={(e) => setSearch(e.target.value)} />
+          </div>
+          <button className="btn btn-accent btn-shine" onClick={openCreate}>
+            <Plus size={16} /> Add item
+          </button>
+        </div>
       </div>
 
       {error && <div className="error-banner">{error}</div>}
+
       {loading ? (
         <p>Loading…</p>
+      ) : filtered.length === 0 ? (
+        <div className="empty-state">
+          <UtensilsCrossed />
+          <h3>No items found</h3>
+          <p>{search ? "Try a different search term." : "Add your first menu item to get started."}</p>
+        </div>
       ) : (
         <div className="table-wrap">
           <table>
@@ -103,7 +127,7 @@ export default function AdminMenu() {
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => (
+              {filtered.map((item) => (
                 <tr key={item.id}>
                   <td>
                     {item.image_url ? (
@@ -114,18 +138,20 @@ export default function AdminMenu() {
                   </td>
                   <td>{item.name}</td>
                   <td>{item.category}</td>
-                  <td>{item.badge && <span className={`product-badge badge-${item.badge.replace(/\s+/g, "-").toLowerCase()}`}>{item.badge}</span>}</td>
+                  <td>{item.badge && <span className={`product-badge badge-${item.badge.replace(/\s+/g, "-").toLowerCase()}`} style={{ position: "static" }}>{item.badge}</span>}</td>
                   <td>${item.price.toFixed(2)}</td>
-                  <td>{item.is_available ? "Available" : "Sold out"}</td>
-                  <td style={{ display: "flex", gap: 8 }}>
-                    <button className="btn btn-outline btn-sm" onClick={() => openEdit(item)}>Edit</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(item.id, item.name)}>Delete</button>
+                  <td><span className={`status-badge ${item.is_available ? "status-completed" : "status-cancelled"}`}>{item.is_available ? "Available" : "Sold out"}</span></td>
+                  <td>
+                    <ActionMenu
+                      items={[
+                        { label: "Edit", icon: <Pencil size={15} />, onClick: () => openEdit(item) },
+                        { divider: true },
+                        { label: "Delete", icon: <Trash2 size={15} />, danger: true, onClick: () => handleDelete(item.id, item.name) },
+                      ]}
+                    />
                   </td>
                 </tr>
               ))}
-              {items.length === 0 && (
-                <tr><td colSpan={7} style={{ textAlign: "center", padding: 24 }}>No menu items yet.</td></tr>
-              )}
             </tbody>
           </table>
         </div>

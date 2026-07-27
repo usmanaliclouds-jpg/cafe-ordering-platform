@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { ShoppingBag, LogOut, LayoutDashboard, ClipboardList, Coffee } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
 
@@ -11,7 +12,8 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-        <NavLink to="/" className="brand" style={{ textDecoration: "none" }}>
+        <NavLink to="/" className="brand">
+          <Coffee size={20} />
           Ember <span className="dot">&amp;</span> Oak
         </NavLink>
         <div className="nav-links">
@@ -30,7 +32,7 @@ export default function Navbar() {
           )}
           {!isAdmin && (
             <NavLink to="/cart" className="cart-pill">
-              Cart {count > 0 && `· ${count}`}
+              <ShoppingBag /> {count > 0 && count}
             </NavLink>
           )}
           {user ? (
@@ -41,7 +43,7 @@ export default function Navbar() {
                 navigate("/");
               }}
             >
-              Log out
+              <LogOut size={14} /> Log out
             </button>
           ) : (
             <NavLink to="/login" className={({ isActive }) => (isActive ? "active" : "")}>

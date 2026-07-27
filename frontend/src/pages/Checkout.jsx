@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
+import { AlertCircle } from "lucide-react";
 import { api } from "../api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
@@ -49,7 +50,7 @@ export default function Checkout() {
     <div className="container" style={{ maxWidth: 640, paddingTop: 40, paddingBottom: 60 }}>
       <h1>Checkout</h1>
 
-      <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: 10, padding: 20, marginBottom: 24 }}>
+      <div className="summary-card" style={{ position: "static", marginBottom: 24 }}>
         {items.map((i) => (
           <div className="cart-summary-row" key={i.menu_item_id}>
             <span>{i.quantity} × {i.name}</span>
@@ -62,16 +63,20 @@ export default function Checkout() {
         </div>
       </div>
 
-      {error && <div className="error-banner">{error}</div>}
+      {error && (
+        <div className="error-banner">
+          <AlertCircle size={16} /> {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
-        <div className="field">
+        <div className="float-field">
+          <input id="customerName" placeholder=" " required value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
           <label htmlFor="customerName">Full name</label>
-          <input id="customerName" required value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
         </div>
-        <div className="field">
+        <div className="float-field">
+          <input id="phone" placeholder=" " required value={phone} onChange={(e) => setPhone(e.target.value)} />
           <label htmlFor="phone">Phone number</label>
-          <input id="phone" required value={phone} onChange={(e) => setPhone(e.target.value)} />
         </div>
         <div className="field">
           <label htmlFor="address">Delivery address</label>
@@ -81,7 +86,7 @@ export default function Checkout() {
           <label htmlFor="notes">Order notes (optional)</label>
           <textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Allergies, delivery instructions, etc." />
         </div>
-        <button className="btn btn-primary btn-block" disabled={loading}>
+        <button className="btn btn-primary btn-block btn-shine" disabled={loading}>
           {loading ? "Placing order…" : `Place order · $${total.toFixed(2)}`}
         </button>
       </form>
